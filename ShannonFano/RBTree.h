@@ -6,14 +6,14 @@
 #include "TreePrinter.h"
 
 #pragma region Tree_Iterator_classes
-template <typename TKey, typename TValue>
+template <class TKey, class TValue>
 class Iterator
 {
 public:
 	virtual RBNode<TKey, TValue>* Next() = 0;
 	virtual bool HasNext() = 0;
 };
-template <typename TKey, typename TValue>
+template <class TKey, class TValue>
 class TreeDFTIterator : public Iterator<TKey, TValue>
 {
 private:
@@ -45,7 +45,7 @@ public:
 		return stack.GetSize() != 0;
 	}
 };
-template <typename TKey, typename TValue>
+template <class TKey, class TValue>
 class TreeBFTIterator : public Iterator<TKey, TValue>
 {
 private:
@@ -112,14 +112,14 @@ private:
 	}
 	RBNode<TKey, TValue>* findNode(TValue value)
 	{
-		Iterator<TKey,TValue>* iterator = CreateBFTIterator();
+		TreeBFTIterator<TKey, TValue>* iterator = CreateBFTIterator();
 
 		while (iterator->HasNext())
 		{
 			RBNode<TKey, TValue>* result = iterator->Next();
 			if (result->GetValue() == value)
 			{
-				
+
 				delete iterator;
 				return result;
 			}
@@ -352,7 +352,7 @@ public:
 			return;
 		}
 
-		
+
 		newNode->SetParent(target);
 
 		//decide new node left/right position
@@ -379,7 +379,7 @@ public:
 	}
 	List<TKey> GetKeys()
 	{
-		 //just get 'em all via bft
+		//just get 'em all via bft
 		List<TKey> keys;
 		Iterator<TKey, TValue>* bft = CreateBFTIterator();
 
@@ -393,7 +393,7 @@ public:
 	{
 		//just get 'em all via bft
 		List<TValue> values;
-		Iterator<TKey, TValue>* bft = CreateBFTIterator();
+		TreeBFTIterator<TKey, TValue>* bft = CreateBFTIterator();
 
 		while (bft->HasNext())
 			values.Add(bft->Next()->GetValue());
@@ -401,7 +401,7 @@ public:
 		delete bft;
 		return values;
 	}
-	
+
 	void Remove(TKey key)
 	{
 		RBNode<TKey, TValue>* toDelete = findNode(key);
@@ -481,7 +481,7 @@ public:
 	}
 	bool ContainsValue(TValue value)
 	{
-		Iterator<TKey, TValue>* iterator = CreateBFTIterator();
+		TreeBFTIterator<TKey, TValue>* iterator = CreateBFTIterator();
 
 		while (iterator->HasNext())
 		{
@@ -502,6 +502,6 @@ public:
 		a.PrintTree(root, nullptr, false);
 	}
 
-	Iterator<TKey, TValue>* CreateDFTIterator() { return new TreeDFTIterator<TKey, TValue>(root, nil); }
-	Iterator<TKey, TValue>* CreateBFTIterator() { return new TreeBFTIterator<TKey, TValue>(root, nil); }
+	TreeDFTIterator<TKey, TValue>* CreateDFTIterator() { return new TreeDFTIterator<TKey, TValue>(root, nil); }
+	TreeBFTIterator<TKey, TValue>* CreateBFTIterator() { return new TreeBFTIterator<TKey, TValue>(root, nil); }
 };

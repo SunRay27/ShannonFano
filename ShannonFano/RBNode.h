@@ -30,7 +30,17 @@ public:
 		this->left = left;
 		this->right = right;
 	}
-
+	/*
+	RBNode(const RBNode& other)
+	{
+		this->isBlack = other.isBlack;
+		this->key = other.key;
+		this->value = other.value;
+		this->parent = other.parent;
+		this->left = other.left;
+		this->right = other.right;
+	}
+	*/
 #pragma region getters/setters lol
 	void SetParent(RBNode<TKey, TValue>* parent)
 	{

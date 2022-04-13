@@ -12,7 +12,8 @@ class Queue
 public:
 	~Queue()
 	{
-		while (last != nullptr)
+		if(count > 0)
+		while (first != nullptr)
 		{
 			Node<T>* nextNode = first->GetNext();
 			delete first;

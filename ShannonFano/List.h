@@ -476,13 +476,13 @@ public:
 	{
 		Node<T>* currentCopy = nullptr;
 		Node<T>* nextOriginal = nullptr;
-		
+
 		if (other.head != nullptr)
 		{
 			count++;
 			head = new Node<T>();
 			head->SetData(other.head->GetData());
-			head->SetNext(other.head->GetNext());
+			//head->SetNext(other.head->GetNext());
 			currentCopy = head;
 			nextOriginal = other.head->GetNext();
 		}
@@ -498,9 +498,9 @@ public:
 		tail = currentCopy;
 		current = head;
 	}
-	List<T> * PointerToCopy()
+	List<T>* PointerToCopy()
 	{
-		List<T> * toReturn = new List<T>();
+		List<T>* toReturn = new List<T>();
 
 		for (size_t i = 0; i < GetSize(); i++)
 		{

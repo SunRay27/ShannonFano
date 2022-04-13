@@ -9,7 +9,7 @@ class ShannonFanoEncoder
 {
 private:
 	Map<char, String>* operationMap;
-	
+
 	static void FillResultsListRecursive(int leftIndex, int rightIndex, List<float>* probability, List<String>* results)
 	{
 		if (leftIndex < rightIndex)
@@ -44,13 +44,13 @@ private:
 			for (size_t i = leftIndex; i <= rightIndex; i++)
 			{
 				if (i <= middleIndex)
-					(* results).Replace((*results)[i] + '0', i);
+					(*results).Replace((*results)[i] + '0', i);
 				else
 					(*results).Replace((*results)[i] + '1', i);
 			}
 
 			//do it recursively until 1 or 0 characters left
-			FillResultsListRecursive(leftIndex, middleIndex, probability,results);
+			FillResultsListRecursive(leftIndex, middleIndex, probability, results);
 			FillResultsListRecursive(middleIndex + 1, rightIndex, probability, results);
 		}
 
@@ -79,7 +79,7 @@ public:
 	{
 		return Decode(input, operationMap);
 	}
-	
+
 
 	//some copies for static calls
 	static String Encode(String input, Map<char, String>* operationMap)
@@ -125,6 +125,7 @@ public:
 			else
 				accumulator += '0';
 
+			//very bad solution...
 			if (operationMap->ContainsValue(accumulator))
 			{
 				output += operationMap->FindFirstKeyByValue(accumulator);
@@ -132,6 +133,7 @@ public:
 			}
 
 		}
+		delete iterator;
 		cout << endl << "---------output string size: " << output.Length() * 8 << " bits" << endl;
 		return output;
 

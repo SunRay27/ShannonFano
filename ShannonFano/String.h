@@ -27,12 +27,12 @@ public:
 	{
 		return length;
 	}
-	
+
 	//Low-level functions
 
 	char* GetArrayCopy()
 	{
-		char* val = new char[length+1];
+		char* val = new char[length + 1];
 		for (size_t i = 0; i < length; i++)
 			val[i] = value[i];
 		val[length] = '\0';
@@ -48,7 +48,7 @@ public:
 	//copy constructor
 	String(const String& other)
 	{
-		char* copy = new char[other.length+1];
+		char* copy = new char[other.length + 1];
 		for (size_t i = 0; i < other.length; i++)
 			copy[i] = other.value[i];
 		copy[other.length] = '\0';
@@ -97,10 +97,10 @@ public:
 	}
 	String operator=(const String& other)
 	{
-		if (this != &other) 
+		if (this != &other)
 		{
 			length = other.length;
-			char* copy = new char[length+1];
+			char* copy = new char[length + 1];
 			for (size_t i = 0; i < length; i++)
 				copy[i] = other.value[i];
 			copy[length] = '\0';
@@ -141,7 +141,7 @@ public:
 	{
 		return value[index];
 	}
-	friend ostream& operator<<(ostream& stream, const String& string) 
+	friend ostream& operator<<(ostream& stream, const String& string)
 	{
 		//stream << "\"";
 		for (size_t i = 0; i < string.length; i++)
@@ -181,10 +181,10 @@ public:
 		for (size_t i = 0; i < length; i++)
 			newVal[i] = value[i];
 		newVal[length] = toAdd;
-		newVal[length+1] = '\0';
+		newVal[length + 1] = '\0';
 
 		length++;
-		if(value != nullptr)
+		if (value != nullptr)
 			delete[] value;
 		value = newVal;
 	}
@@ -204,7 +204,7 @@ public:
 		value = newVal;
 		length = length + addLen;
 	}
-	
+
 	//... another useless comment
 	bool Equals(const char* toCompare)
 	{
@@ -261,7 +261,7 @@ public:
 		}
 		return false;
 	}
-	
+
 
 	//Lazy concat implementation
 	String Substring(size_t startIndex, size_t endIndex)
@@ -395,12 +395,12 @@ public:
 	public:
 		bool Next()
 		{
-			return (str->value[(currentBitPos / 8)] >> (currentBitPos++%8)) & 1;
+			return (str->value[(currentBitPos / 8)] >> (currentBitPos++ % 8)) & 1;
 		};
-		 bool HasNext() 
-		 {
-			 return currentBitPos < str->length * 8;
-		 };
+		bool HasNext()
+		{
+			return currentBitPos < str->length * 8;
+		};
 
 
 		StringBitIterator(String* str)
@@ -422,7 +422,7 @@ public:
 			charCount++;
 
 		length = charCount;
-		value = new char[length+1];
+		value = new char[length + 1];
 
 
 		for (size_t i = 0; i < length; i++)
@@ -444,6 +444,6 @@ public:
 					value[c] &= ~(1 << bit);
 			}
 		}
-		
+
 	}
 };
