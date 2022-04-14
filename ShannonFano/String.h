@@ -94,6 +94,10 @@ public:
 	{
 		return Equals(toCompare);
 	}
+	bool operator!=(String& toCompare)
+	{
+		return !(* this == toCompare);
+	}
 	String operator=(const String& other)
 	{
 		if (this != &other)

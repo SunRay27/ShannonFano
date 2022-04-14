@@ -42,7 +42,7 @@ int main()
 	HANDLE out = GetStdHandle(STD_OUTPUT_HANDLE);
 	SetConsoleTextAttribute(out, 0x0 | 0x70);
 	SetConsoleOutputCP(1251);
-
+	system("CLS");
 	//It's okay if small (string with big alphabet)'s size is bigger than reference size!
 	//The thing is... I use first 8 bytes of encoded string to store initial character count 
 	//(because program output without validating character count will be close to undefined (because we have only 2 bit values (that is pitiful)))

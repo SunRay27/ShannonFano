@@ -149,60 +149,63 @@ public:
 	{
 		String output;
 
-		SFTNode<char>* searchNode = info->GetDecodeTreeRoot();
-		auto iterator = input.CreateBitIterator();
-
-		size_t actualLength = iterator->GetEncodedStringLength();
-		size_t currentLen = 0;
-		//iterate through string bits
-		while (iterator->HasNext())
+		//not empty
+		if (input.Length() != 8)
 		{
-			//for small code length cases
-			if (currentLen == actualLength)
-				break;
+			SFTNode<char>* searchNode = info->GetDecodeTreeRoot();
+			auto iterator = input.CreateBitIterator();
 
-
-			bool bit = iterator->Next();
-			if (bit == true)
+			size_t actualLength = iterator->GetEncodedStringLength();
+			size_t currentLen = 0;
+			//iterate through string bits
+			while (iterator->HasNext())
 			{
-				//move right in decodeTree
-				if (searchNode->GetRight() != nullptr)
+				//for small code length cases
+				if (currentLen == actualLength)
+					break;
+
+
+				bool bit = iterator->Next();
+				if (bit == true)
 				{
-					searchNode = searchNode->GetRight();
+					//move right in decodeTree
+					if (searchNode->GetRight() != nullptr)
+					{
+						searchNode = searchNode->GetRight();
+					}
+					else
+					{
+						//but what if codes are small and there are 1? char is coded in single byte?
+						//this algorythm will continue adding that char to output until byte is finished
+						//
+
+						//YEAH! that's why I reserve 8 bytes before encoded bits to store character number!!!
+
+						//that means that we already trying to move along sftree for next character
+						//so add current character
+						output += searchNode->GetKey();
+						//and move to desired position in tree
+						searchNode = info->GetDecodeTreeRoot()->GetRight();
+						currentLen++;
+					}
 				}
-				else
+				else // the same for left direction
 				{
-					//but what if codes are small and there are 1? char is coded in single byte?
-					//this algorythm will continue adding that char to output until byte is finished
-					//
-
-					//YEAH! that's why I reserve 8 bytes before encoded bits to store character number!!!
-
-					//that means that we already trying to move along sftree for next character
-					//so add current character
-					output += searchNode->GetKey();
-					//and move to desired position in tree
-					searchNode = info->GetDecodeTreeRoot()->GetRight();
-					currentLen++;
+					// move left in decodeTree
+					if (searchNode->GetLeft() != nullptr)
+					{
+						searchNode = searchNode->GetLeft();
+					}
+					else
+					{
+						output += searchNode->GetKey();
+						searchNode = info->GetDecodeTreeRoot()->GetLeft();
+						currentLen++;
+					}
 				}
 			}
-			else // the same for left direction
-			{
-				// move left in decodeTree
-				if (searchNode->GetLeft() != nullptr)
-				{
-					searchNode = searchNode->GetLeft();
-				}
-				else
-				{
-					output += searchNode->GetKey();
-					searchNode = info->GetDecodeTreeRoot()->GetLeft();
-					currentLen++;
-				}
-			}
+			delete iterator;
 		}
-		delete iterator;
-
 		if (verbose)
 		{
 			float compressionRatio = 1 - (float)output.Length() / input.Length();
@@ -215,6 +218,20 @@ public:
 
 	static ShannonFanoInfo* CreateOperationInfo(String alphabetInput, bool verbose = false)
 	{
+		//I could make an exception for this
+		//but i wouldn't 
+		//it's not a mistake to make trees out of nothing
+		//it just means that the trees will be empty
+		if (alphabetInput.Length() == 0)
+		{
+			//build encode tree
+			Map<char, String>* encodeTree = new Map<char, String>();
+
+			//build decode tree?
+			SFTree<char>* decodeTree = new SFTree<char>(new SFTNode<char>(0));
+			return new ShannonFanoInfo(decodeTree, encodeTree);
+		}
+
 		//create alphabet
 		List <char> alphabet;
 		List<String> results;
