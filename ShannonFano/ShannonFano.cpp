@@ -47,7 +47,7 @@ int main()
 	//The thing is... I use first 8 bytes of encoded string to store initial character count 
 	//(because program output without validating character count will be close to undefined (because we have only 2 bit values (that is pitiful)))
 
-	// ? char is for non-printable char values
+	// ? char stands for non-printable char values
 
 	//And like always, no forgotten heap objects
 
@@ -58,10 +58,10 @@ int main()
 	TestShannon("Genius is one percent inspiration and ninety-nine percent perspiration. @Thomas Edison");
 
 
+	cout << "\nNow enter your string:\n";
 
 	char inputBuffer[512];
 	cin.get(inputBuffer, 512);
+
 	TestShannon(inputBuffer, true);
-
-
 }

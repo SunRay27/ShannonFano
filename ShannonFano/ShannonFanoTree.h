@@ -1,15 +1,7 @@
-#include <stdexcept>
 #include <iostream>
-#include <string>
-#include "Queue.h";
-#include "Stack.h";
 #include "SFTNode.h"
 #include "SFTreePrinter.h"
 using namespace std;
-
-
-
-
 
 template <class TKey>
 class SFTree

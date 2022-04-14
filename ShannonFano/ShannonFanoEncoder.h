@@ -123,6 +123,7 @@ public:
 		String output;
 
 
+		//C# style... what bool* is?
 		List<bool> bits;
 		for (size_t i = 0; i < input.Length(); i++)
 		{
@@ -155,7 +156,7 @@ public:
 			SFTNode<char>* searchNode = info->GetDecodeTreeRoot();
 			auto iterator = input.CreateBitIterator();
 
-			size_t actualLength = iterator->GetEncodedStringLength();
+			size_t actualLength = iterator->GetOriginalStringLength();
 			size_t currentLen = 0;
 			//iterate through string bits
 			while (iterator->HasNext())
@@ -232,7 +233,10 @@ public:
 			return new ShannonFanoInfo(decodeTree, encodeTree);
 		}
 
-		//create alphabet
+		//C# style forever, performance doesn't matter
+		//since we know length of the alphabet, we don't need lists, can be easily changed to arrays
+
+		//honestly, if I weren't using my collections, they wouldn't evolve and weren't usable for different complex tasks
 		List <char> alphabet;
 		List<String> results;
 		List <float> probability;
@@ -259,6 +263,8 @@ public:
 			probability.Replace((float)count[i] / alphabetInput.Length(), i);
 
 
+
+		//its just for demonstration purposes? right?
 		//now superBubbleSort everything by descending
 		size_t n = probability.GetSize();
 		for (size_t i = 0; i < n - 1; i++)
@@ -286,6 +292,7 @@ public:
 			results.Add("");
 
 
+		
 		if (alphabet.GetSize() != 1)
 		{
 			//fill results list
@@ -293,7 +300,7 @@ public:
 			size_t rightIndex = alphabet.GetSize() - 1;
 			FillResultsListRecursive(leftIndex, rightIndex, &probability, &results);
 		}
-		else
+		else //bycycle for 1 element alphabet
 		{
 			results.Replace("1", 0);
 		}

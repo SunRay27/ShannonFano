@@ -404,7 +404,7 @@ public:
 		size_t currentBitPos;
 		String* str;
 	public:
-		size_t GetEncodedStringLength()
+		size_t GetOriginalStringLength()
 		{
 			//remember... first 8 bytes...
 			//it's just better for everyone's eyes to access pretty-named var than accessing str->value[i]
