@@ -4,7 +4,7 @@
 using namespace std;
 
 template <typename TKey, typename TValue>
-class TreePrinter
+class RBTreePrinter
 {
 	struct DrawNode
 	{
@@ -32,7 +32,7 @@ class TreePrinter
 	RBNode<TKey, TValue>* nil;
 public:
 
-	TreePrinter(RBNode<TKey, TValue>* nil)
+	RBTreePrinter(RBNode<TKey, TValue>* nil)
 	{
 		this->nil = nil;
 	}
@@ -72,7 +72,7 @@ public:
 		else
 			SetConsoleTextAttribute(out, 0x4 | 0x70);//red on white
 
-		cout << " " << currentNode->GetKey() << endl;
+		cout << " " << currentNode->GetKey() << " " << currentNode->GetValue() << endl;
 		SetConsoleTextAttribute(out, 0x0 | 0x70);
 
 		if (previousDrawNode)
@@ -83,7 +83,7 @@ public:
 		PrintTree(currentNode->GetLeft(), drawNode, false);
 	}
 
-	~TreePrinter()
+	~RBTreePrinter()
 	{
 		for (size_t i = 0; i < drawNodes.GetSize(); i++)
 			delete drawNodes[i];

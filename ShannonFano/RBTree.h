@@ -3,7 +3,8 @@
 #include "Stack.h"
 #include "Queue.h"
 #include "List.h"
-#include "TreePrinter.h"
+#include "RBTreePrinter.h"
+#include <string>
 
 #pragma region Tree_Iterator_classes
 template <class TKey, class TValue>
@@ -108,23 +109,7 @@ private:
 					current = current->GetRight();
 			}
 		}
-		throw invalid_argument("key is not present in collection");
-	}
-	RBNode<TKey, TValue>* findNode(TValue value)
-	{
-		TreeBFTIterator<TKey, TValue>* iterator = CreateBFTIterator();
-
-		while (iterator->HasNext())
-		{
-			RBNode<TKey, TValue>* result = iterator->Next();
-			if (result->GetValue() == value)
-			{
-
-				delete iterator;
-				return result;
-			}
-		}
-		throw invalid_argument("value is not present in collection");
+		throw invalid_argument("key " + std::to_string(key) + " is not present in collection");
 	}
 #pragma region Tree_transformations
 
@@ -329,7 +314,7 @@ public:
 	void Insert(TKey key, TValue value)
 	{
 		if (GetKeys().Contains(key))
-			throw std::invalid_argument("key is already present");
+			throw std::invalid_argument("key " + std::to_string(key) + " is already present");
 
 		RBNode<TKey, TValue>* newNode = new RBNode<TKey, TValue>(false, key, value, nil, nil, nil);
 		RBNode<TKey, TValue>* curNode = root;
@@ -370,12 +355,7 @@ public:
 	TValue Find(TKey key)
 	{
 		return findNode(key)->GetValue();
-		throw invalid_argument("key is not present in collection");
-	}
-	TKey FindFirstKeyByValue(TValue value)
-	{
-		return findNode(value)->GetKey();
-		throw invalid_argument("key is not present in collection");
+		throw invalid_argument("key " + std::to_string(key) + " is not present in collection");
 	}
 	List<TKey> GetKeys()
 	{
@@ -497,7 +477,7 @@ public:
 	}
 	void Print()
 	{
-		TreePrinter<TKey, TValue> a(nil);
+		RBTreePrinter<TKey, TValue> a(nil);
 		cout << endl << endl;
 		a.PrintTree(root, nullptr, false);
 	}

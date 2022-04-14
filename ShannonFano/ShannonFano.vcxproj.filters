@@ -41,14 +41,23 @@
     <ClInclude Include="Stack.h">
       <Filter>Исходные файлы\Collections</Filter>
     </ClInclude>
-    <ClInclude Include="TreePrinter.h">
+    <ClInclude Include="RBTreePrinter.h">
       <Filter>Исходные файлы\Collections</Filter>
     </ClInclude>
-    <ClInclude Include="ShannonFanoObject.h">
+    <ClInclude Include="ShannonFanoEncoder.h">
       <Filter>Исходные файлы</Filter>
     </ClInclude>
     <ClInclude Include="String.h">
       <Filter>Исходные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="SFTreePrinter.h">
+      <Filter>Исходные файлы\Collections</Filter>
+    </ClInclude>
+    <ClInclude Include="SFTNode.h">
+      <Filter>Исходные файлы\Collections</Filter>
+    </ClInclude>
+    <ClInclude Include="ShannonFanoTree.h">
+      <Filter>Исходные файлы\Collections</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

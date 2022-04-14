@@ -154,6 +154,15 @@ public:
 		//stream << "\"";
 		return stream;
 	}
+
+	friend bool operator<(const String& l, const String& r)
+	{
+		return lexicographical_compare(l.value, l.value + l.length, r.value, r.value + r.length);
+	}
+	friend bool operator>(const String& l, const String& r)
+	{
+		return !(l<r);
+	}
 	//concatenation functions
 	void Concat(const char* toAdd)
 	{
@@ -430,7 +439,7 @@ public:
 
 		value[length] = '\0';
 
-		//now we somehow smash these bits across chars
+		//now we smash these bits across chars
 		for (size_t c = 0; c < length; c++)
 		{
 			size_t offset = c * 8;

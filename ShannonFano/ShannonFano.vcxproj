@@ -142,15 +142,18 @@
     <ClCompile Include="ShannonFano.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="SFTreePrinter.h" />
     <ClInclude Include="List.h" />
     <ClInclude Include="Node.h" />
     <ClInclude Include="Queue.h" />
     <ClInclude Include="RBNode.h" />
     <ClInclude Include="RBTree.h" />
-    <ClInclude Include="ShannonFanoObject.h" />
+    <ClInclude Include="ShannonFanoEncoder.h" />
+    <ClInclude Include="ShannonFanoTree.h" />
     <ClInclude Include="Stack.h" />
     <ClInclude Include="String.h" />
-    <ClInclude Include="TreePrinter.h" />
+    <ClInclude Include="SFTNode.h" />
+    <ClInclude Include="RBTreePrinter.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
