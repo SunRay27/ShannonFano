@@ -68,10 +68,10 @@ public:
 		while (value[length] != '\0')
 			length++;
 
-		char* copy = new char[length];
+		char* copy = new char[length+1];
 		for (size_t i = 0; i < length; i++)
 			copy[i] = value[i];
-
+		copy[length] = '\0';
 		this->value = copy;
 	}
 	String(const char value)
@@ -83,7 +83,6 @@ public:
 
 		this->value = copy;
 	}
-
 	~String()
 	{
 		if (value != nullptr)
@@ -393,40 +392,71 @@ public:
 		return toReturn;
 	}
 
-	//bit add-on
-
-
-	class StringBitIterator
+	//bit add-on for this lab
+	class ShannonFanoEncodedStringBitIterator
 	{
 	private:
-		size_t currentBitPos = 0;
+		const int countByteSize = 8;
+		size_t currentBitPos;
 		String* str;
 	public:
+		size_t GetEncodedStringLength()
+		{
+			//remember... first 8 bytes...
+			//it's just better for everyone's eyes to access pretty-named var than accessing str->value[i]
+			char* buffer = new char[countByteSize];
+			for (size_t i = 0; i < countByteSize; i++)
+				buffer[i] = str->value[i];
+
+			//yeah, that is how we do programs in 2022
+			//and I'm happy about it
+			//probably...
+		 size_t size = (((size_t)buffer[0] << 56) & 0xff00000000000000u) |
+					   (((size_t)buffer[1] << 48) & 0x00ff000000000000u) |
+					   (((size_t)buffer[2] << 40) & 0x0000ff0000000000u) |
+					   (((size_t)buffer[3] << 32) & 0x000000ff00000000u) |
+					   ((buffer[4] << 24)		  & 0x00000000ff000000u) |
+					   ((buffer[5] << 16)		  & 0x0000000000ff0000u) |
+					   ((buffer[6] << 8)		  & 0x000000000000ff00u) |
+					   ( buffer[7]				  & 0x00000000000000ffu);
+				
+			//cout << "\ngot " << size << " from 8 bytes...\n";
+
+			delete buffer;
+			return size;
+		}
 		bool Next()
 		{
 			return (str->value[(currentBitPos / 8)] >> (currentBitPos++ % 8)) & 1;
 		};
 		bool HasNext()
 		{
-			return currentBitPos < str->length * 8;
+			//i dont know if i'm bad at math or this universe is fooling me... <+1> shouldn't be here...
+			//but we are protected from going out of bounds by Decode() in ShannonFanoEncoder
+			//so it doesn't matter
+			return (currentBitPos < str->length * 8 + 1);
 		};
 
-
-		StringBitIterator(String* str)
+		ShannonFanoEncodedStringBitIterator(String* str)
 		{
 			this->str = str;
+			currentBitPos = countByteSize * 8;
 		}
 	};
-	StringBitIterator* CreateBitIterator()
+	ShannonFanoEncodedStringBitIterator* CreateBitIterator()
 	{
-		return new StringBitIterator(this);
+		return new ShannonFanoEncodedStringBitIterator(this);
 	}
 
-	void WriteBits(List<bool> bits)
+	void WriteShannonFanoBits(List<bool> bits, size_t letterCount)
 	{
 		delete value;
 
-		size_t charCount = bits.GetSize() / 8;
+		//save letterCount for decoding purposes...
+		size_t bytesForLetterCount = 8;
+
+
+		size_t charCount = bits.GetSize() / 8 + bytesForLetterCount;
 		if (bits.GetSize() % 8 != 0)
 			charCount++;
 
@@ -434,20 +464,31 @@ public:
 		value = new char[length + 1];
 
 
-		for (size_t i = 0; i < length; i++)
+		//cout << "\nencoding " << letterCount << " to 8 bytes...\n";
+		
+		//now we smash letterCount across chars
+		//hell yeah
+		for (size_t i = 0; i < bytesForLetterCount; i++)
+			value[i] = letterCount >> (8 - 1 - i) * 8;
+
+		//init writable chars
+		for (size_t i = bytesForLetterCount; i < length; i++)
 			value[i] = 0;
 
 		value[length] = '\0';
 
 		//now we smash these bits across chars
-		for (size_t c = 0; c < length; c++)
+		//hell yeah
+		for (size_t c = bytesForLetterCount; c < length; c++)
 		{
 			size_t offset = c * 8;
 			for (size_t bit = 0; bit < 8; bit++)
 			{
-				if (offset + bit > bits.GetSize() - 1)
+				size_t bitListIndex = offset + bit - bytesForLetterCount * 8;
+				if (bitListIndex > bits.GetSize() - 1)
 					break;
-				if (bits[offset + bit])
+
+				if (bits[bitListIndex])
 					value[c] |= 1 << bit;
 				else
 					value[c] &= ~(1 << bit);

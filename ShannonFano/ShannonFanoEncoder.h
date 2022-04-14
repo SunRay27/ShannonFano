@@ -39,8 +39,8 @@ class ShannonFanoEncoder
 private:
 	//Map<char, String>* operationMap;
 	ShannonFanoInfo* info;
-	bool verbose = false;
-	static void FillResultsListRecursive(int leftIndex, int rightIndex, List<float>* probability, List<String>* results)
+	bool verbose;
+	static void FillResultsListRecursive(size_t leftIndex, size_t rightIndex, List<float>* probability, List<String>* results)
 	{
 		if (leftIndex < rightIndex)
 		{
@@ -52,7 +52,7 @@ private:
 
 
 			//split symbols in half
-			int middleIndex = rightIndex;
+			size_t middleIndex = rightIndex;
 			float rightHalfProbability = (*probability)[rightIndex];
 
 
@@ -87,6 +87,10 @@ private:
 			FillResultsListRecursive(leftIndex, middleIndex, probability, results);
 			FillResultsListRecursive(middleIndex + 1, rightIndex, probability, results);
 		}
+		else if (leftIndex == rightIndex)
+		{
+			//(*results).Replace((*results)[rightIndex] + '1', rightIndex);
+		}
 
 
 
@@ -100,6 +104,7 @@ public:
 	ShannonFanoEncoder(String alphabet, bool verbose = false)
 	{
 		info = CreateOperationInfo(alphabet, verbose);
+		this->verbose = verbose;
 	}
 
 	String Encode(String input)
@@ -129,16 +134,15 @@ public:
 				bits.Add(bitCode[j] == '1' ? true : false);
 		}
 		//compose string out of these bits
-		output.WriteBits(bits);
+		output.WriteShannonFanoBits(bits, input.Length());
 
 		if (verbose)
 		{
 			float compressionRatio = 1 - (float)output.Length() / input.Length();
 			cout << endl << "Encoding results: " << input.Length() * 8 << " bits -> " << output.Length() * 8 << " bits"
 				<< "\nCompression ratio: " << compressionRatio * 100 << "%" << endl;
-
-			return output;
 		}
+		return output;
 	}
 
 	static String Decode(String input, ShannonFanoInfo* info, bool verbose = false)
@@ -148,9 +152,16 @@ public:
 		SFTNode<char>* searchNode = info->GetDecodeTreeRoot();
 		auto iterator = input.CreateBitIterator();
 
+		size_t actualLength = iterator->GetEncodedStringLength();
+		size_t currentLen = 0;
 		//iterate through string bits
 		while (iterator->HasNext())
 		{
+			//for small code length cases
+			if (currentLen == actualLength)
+				break;
+
+
 			bool bit = iterator->Next();
 			if (bit == true)
 			{
@@ -161,12 +172,18 @@ public:
 				}
 				else
 				{
+					//but what if codes are small and there are 1? char is coded in single byte?
+					//this algorythm will continue adding that char to output until byte is finished
+					//
+
+					//YEAH! that's why I reserve 8 bytes before encoded bits to store character number!!!
+
 					//that means that we already trying to move along sftree for next character
 					//so add current character
 					output += searchNode->GetKey();
-
 					//and move to desired position in tree
 					searchNode = info->GetDecodeTreeRoot()->GetRight();
+					currentLen++;
 				}
 			}
 			else // the same for left direction
@@ -178,9 +195,9 @@ public:
 				}
 				else
 				{
-
 					output += searchNode->GetKey();
 					searchNode = info->GetDecodeTreeRoot()->GetLeft();
+					currentLen++;
 				}
 			}
 		}
@@ -205,7 +222,7 @@ public:
 		List <int> count;
 
 		//fill alphabet, count and probability lists 
-		for (int i = 0; i < alphabetInput.Length(); i++)
+		for (size_t i = 0; i < alphabetInput.Length(); i++)
 		{
 			int index = alphabet.IndexOf(alphabetInput[i]);
 			if (index == -1)
@@ -221,14 +238,14 @@ public:
 		}
 
 		//now update probabilities
-		for (int i = 0; i < alphabet.GetSize(); i++)
+		for (size_t i = 0; i < alphabet.GetSize(); i++)
 			probability.Replace((float)count[i] / alphabetInput.Length(), i);
 
 
 		//now superBubbleSort everything by descending
-		int n = probability.GetSize();
-		for (int i = 0; i < n - 1; i++)
-			for (int j = 0; j < n - i - 1; j++)
+		size_t n = probability.GetSize();
+		for (size_t i = 0; i < n - 1; i++)
+			for (size_t j = 0; j < n - i - 1; j++)
 				if (probability[j] < probability[j + 1])
 				{
 					alphabet.Swap(j, j + 1);
@@ -252,10 +269,17 @@ public:
 			results.Add("");
 
 
-		//fill results list
-		int leftIndex = 0;
-		int rightIndex = alphabet.GetSize() - 1;
-		FillResultsListRecursive(leftIndex, rightIndex, &probability, &results);
+		if (alphabet.GetSize() != 1)
+		{
+			//fill results list
+			size_t leftIndex = 0;
+			size_t rightIndex = alphabet.GetSize() - 1;
+			FillResultsListRecursive(leftIndex, rightIndex, &probability, &results);
+		}
+		else
+		{
+			results.Replace("1", 0);
+		}
 
 		//thats all folks
 		if (verbose)
@@ -282,10 +306,9 @@ public:
 			String bitSeq = results[i];
 			char targetChar = alphabet[i];
 			SFTNode<char>* searchNode = decodeTree->GetRoot();
-			//String accumulator;
+
 			for (size_t j = 0; j < bitSeq.Length(); j++)
 			{
-				//accumulator += bitSeq[j];
 				if (bitSeq[j] == '0')
 				{
 					//move left
@@ -297,10 +320,9 @@ public:
 					{
 						if (j != bitSeq.Length() - 1)
 							searchNode->SetLeft(new SFTNode<char>(0));
-						//operationMap->Insert(accumulator, 0);
 						else
 							searchNode->SetLeft(new SFTNode< char>(targetChar));
-						//operationMap->Insert(accumulator, targetChar);
+
 						searchNode = searchNode->GetLeft();
 					}
 				}
@@ -315,17 +337,13 @@ public:
 					{
 						if (j != bitSeq.Length() - 1)
 							searchNode->SetRight(new SFTNode<char>(0));
-						//operationMap->Insert(accumulator, 0);
 						else
-							//operationMap->Insert(accumulator, targetChar);
 							searchNode->SetRight(new SFTNode< char>(targetChar));
+
 						searchNode = searchNode->GetRight();
 					}
 				}
-				//decodeTree->Print();
 			}
-
-
 		}
 
 		if (verbose)
@@ -333,7 +351,6 @@ public:
 			cout << "\n------------------Decode tree------------------\n";
 			decodeTree->Print();
 		}
-
 
 		return new ShannonFanoInfo(decodeTree, encodeTree);
 	}
